@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horizon Trading Cards — Cyberpunk Sealed TCG Event</title>
+<meta name="description" content="Cyberpunk Sealed TCG Event at Horizon Trading Cards. Saturday 14 November, 5pm. $50 sealed kit, pay at the door. Get your name on a kit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  /* ============ SETTINGS ============ */
+  /* Total kits lives in the script below (TOTAL_KITS). */
+
+  :root {
+    --bg: #07070c;
+    --panel: #0d0d16;
+    --cyan: #00f0ff;
+    --accent: #fcee0a;
+    --yellow: #f5e663;
+    --text: #d8e4f0;
+    --dim: #6b7a8f;
+    --line: rgba(0, 240, 255, 0.25);
+    --mono: "Share Tech Mono", ui-monospace, "Consolas", monospace;
+    --display: "Orbitron", "Arial Black", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { background: var(--bg); }
+
+  body {
+    min-height: 100vh;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 17px;
+    line-height: 1.5;
+    background:
+      linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px) 0 0 / 40px 40px,
+      radial-gradient(ellipse at 50% -10%, rgba(252, 238, 10, 0.18), transparent 60%),
+      var(--bg);
+    padding: 32px 18px 48px;
+  }
+
+  /* scanlines */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+    z-index: 10;
+  }
+
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+  /* ============ HEADER ============ */
+  header { text-align: center; margin-bottom: 28px; }
+
+  .sys {
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    color: var(--dim);
+    margin-bottom: 14px;
+  }
+  .sys .blink { color: var(--accent); animation: blink 1.2s steps(2) infinite; }
+
+  .title {
+    position: relative;
+    display: inline-block;
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(30px, 8.5vw, 56px);
+    line-height: 1.02;
+    letter-spacing: 0.04em;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 0 0 18px rgba(0, 240, 255, 0.55);
+  }
+  .title::before,
+  .title::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .title::before {
+    color: var(--cyan);
+    transform: translate(-3px, 0);
+    clip-path: inset(0 0 60% 0);
+    animation: glitch-a 3.2s infinite steps(1);
+    mix-blend-mode: screen;
+  }
+  .title::after {
+    color: var(--accent);
+    transform: translate(3px, 0);
+    clip-path: inset(55% 0 0 0);
+    animation: glitch-b 2.7s infinite steps(1);
+    mix-blend-mode: screen;
+  }
+
+  .event {
+    margin-top: 18px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(15px, 4vw, 20px);
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-shadow: 0 0 12px rgba(252, 238, 10, 0.6);
+    text-transform: uppercase;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .chip {
+    border: 1px solid var(--line);
+    padding: 6px 12px;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    color: var(--cyan);
+    background: rgba(0, 240, 255, 0.05);
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  .chip b { color: #fff; font-weight: normal; }
+
+  /* ============ PANELS ============ */
+  .panel {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 24px 22px;
+    margin-bottom: 18px;
+  }
+  /* HUD corner brackets */
+  .panel::before,
+  .panel::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--cyan);
+  }
+  .panel::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+  .panel::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+
+  .label {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* ============ COUNTER ============ */
+  .counter { text-align: center; }
+
+  .count {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(72px, 22vw, 120px);
+    line-height: 1;
+    color: var(--cyan);
+    text-shadow: 0 0 24px rgba(0, 240, 255, 0.7), 0 0 60px rgba(0, 240, 255, 0.3);
+  }
+  .count-label {
+    margin-top: 8px;
+    font-family: var(--display);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    font-size: 16px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+
+  .bar {
+    display: grid;
+    grid-template-columns: repeat(var(--total, 12), 1fr);
+    gap: 5px;
+    margin: 20px auto 0;
+    max-width: 420px;
+  }
+  .bar span {
+    height: 14px;
+    background: rgba(0, 240, 255, 0.85);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    transform: skewX(-18deg);
+  }
+  .bar span.taken {
+    background: rgba(252, 238, 10, 0.25);
+    box-shadow: none;
+    outline: 1px solid rgba(252, 238, 10, 0.5);
+  }
+
+  .sub {
+    margin-top: 14px;
+    font-size: 15px;
+    color: var(--dim);
+  }
+  .sub b { color: var(--yellow); font-weight: normal; }
+
+  /* sold-out state */
+  .soldout .count { color: var(--accent); text-shadow: 0 0 24px rgba(252, 238, 10, 0.7), 0 0 60px rgba(252, 238, 10, 0.3); }
+  .soldout .panel::before, .soldout .panel::after { border-color: var(--accent); }
+
+  /* ============ FORM ============ */
+  form { display: grid; gap: 14px; }
+
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .fields { grid-template-columns: 1fr; } }
+
+  label.f { display: grid; gap: 6px; font-size: 13px; letter-spacing: 0.15em; color: var(--cyan); text-transform: uppercase; }
+
+  input {
+    width: 100%;
+    font: inherit;
+    font-size: 18px;
+    color: #fff;
+    background: #05050a;
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    outline: none;
+    border-radius: 0;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan), 0 0 16px rgba(0, 240, 255, 0.35); }
+
+  button {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #07070c;
+    background: var(--cyan);
+    border: 0;
+    padding: 16px 20px;
+    cursor: pointer;
+    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+    transition: filter 0.15s, transform 0.05s;
+  }
+  button:hover { filter: brightness(1.15); }
+  button:active { transform: translateY(1px); }
+  button:disabled { filter: grayscale(0.7) brightness(0.7); cursor: wait; }
+  .soldout button { background: var(--accent); }
+
+  /* ============ RESULT ============ */
+  .result {
+    display: none;
+    border-left: 3px solid var(--cyan);
+    background: rgba(0, 240, 255, 0.06);
+    padding: 14px 16px;
+  }
+  .result.show { display: block; }
+  .result.queue { border-color: var(--accent); background: rgba(252, 238, 10, 0.08); }
+  .result.error { border-color: #fff; background: rgba(255, 255, 255, 0.06); }
+  .result .big {
+    font-family: var(--display);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 19px;
+    color: #fff;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .result p { color: var(--text); font-size: 15px; }
+
+  /* ============ RULES ============ */
+  .rules ol { list-style: none; display: grid; gap: 12px; counter-reset: r; }
+  .rules li { position: relative; padding-left: 40px; font-size: 16px; }
+  .rules li::before {
+    counter-increment: r;
+    content: "0" counter(r);
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: var(--display);
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .rules strong { color: var(--yellow); font-weight: normal; }
+
+  footer { text-align: center; margin-top: 26px; font-size: 12px; letter-spacing: 0.25em; color: var(--dim); }
+
+  /* ============ ANIMATION ============ */
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes glitch-a {
+    0%, 86%, 100% { transform: translate(-2px, 0); clip-path: inset(0 0 60% 0); }
+    88% { transform: translate(-6px, -1px); clip-path: inset(10% 0 70% 0); }
+    92% { transform: translate(4px, 1px); clip-path: inset(40% 0 35% 0); }
+  }
+  @keyframes glitch-b {
+    0%, 82%, 100% { transform: translate(2px, 0); clip-path: inset(55% 0 0 0); }
+    84% { transform: translate(6px, 1px); clip-path: inset(70% 0 5% 0); }
+    90% { transform: translate(-5px, 0); clip-path: inset(30% 0 50% 0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+
+  <header>
+    <div class="sys">&gt; LINK ESTABLISHED <span class="blink">_</span></div>
+    <h1 class="title" data-text="Horizon Trading Cards">Horizon Trading Cards</h1>
+    <div class="event">// Cyberpunk Sealed TCG Event</div>
+    <div class="meta">
+      <span class="chip">SAT <b>14 NOV</b></span>
+      <span class="chip">START <b>5:00 PM</b></span>
+      <span class="chip">SEALED KIT <b>$50</b> · PAY AT THE DOOR</span>
+    </div>
+  </header>
+
+  <section class="panel counter" aria-live="polite">
+    <div class="label">Status</div>
+    <div class="count" id="count">--</div>
+    <div class="count-label" id="countLabel">Kits Available</div>
+    <div class="bar" id="bar" aria-hidden="true"></div>
+    <div class="sub" id="sub">Connecting…</div>
+  </section>
+
+  <section class="panel">
+    <div class="label">Get your name on a kit</div>
+    <form id="form" autocomplete="on">
+      <div class="fields">
+        <label class="f">First name
+          <input id="first" name="first" type="text" required maxlength="50" autocomplete="given-name">
+        </label>
+        <label class="f">Last name
+          <input id="last" name="last" type="text" required maxlength="50" autocomplete="family-name">
+        </label>
+      </div>
+      <button type="submit" id="btn">Reserve my kit</button>
+      <div class="result" id="result" role="status"></div>
+    </form>
+  </section>
+
+  <section class="panel rules">
+    <div class="label">The rules</div>
+    <ol>
+      <li>Enter your name to reserve a kit. Pay <strong>$50</strong> at the door.</li>
+      <li>Not here by <strong>5:00 PM</strong>? Your kit goes to the next person on the list.</li>
+      <li>Kits sold out? Get your name down anyway. Every no-show moves the queue up.</li>
+    </ol>
+  </section>
+
+  <footer>HORIZON TRADING CARDS</footer>
+</div>
+
+<script>
+  // ============ SETTINGS ============
+  const TOTAL_KITS   = 12;
+  const SUPABASE_URL = "https://giokatxfvlfwtcxqnybh.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_efKQ1Hz7YjCfHR14nCNaJA_Y5ENo7RL";
+  const REFRESH_SECONDS = 15;
+  // ===================================
+
+  const $ = (id) => document.getElementById(id);
+  const app = $("app"), countEl = $("count"), labelEl = $("countLabel"),
+        bar = $("bar"), sub = $("sub"), form = $("form"), btn = $("btn"), result = $("result");
+
+  bar.style.setProperty("--total", TOTAL_KITS);
+  for (let i = 0; i < TOTAL_KITS; i++) bar.appendChild(document.createElement("span"));
+
+  async function rpc(fn, body) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(body || {})
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.message) || `Request failed (${res.status})`);
+    return data;
+  }
+
+  function render(names) {
+    const left = Math.max(TOTAL_KITS - names, 0);
+    const soldOut = left === 0;
+    app.classList.toggle("soldout", soldOut);
+
+    [...bar.children].forEach((s, i) => s.classList.toggle("taken", i < Math.min(names, TOTAL_KITS)));
+
+    if (!soldOut) {
+      countEl.textContent = left;
+      labelEl.textContent = left === 1 ? "Kit Available" : "Kits Available";
+      sub.innerHTML = `<b>${names}</b> of ${TOTAL_KITS} kits reserved`;
+      btn.textContent = "Reserve my kit";
+    } else {
+      const queue = names - TOTAL_KITS;
+      countEl.textContent = queue;
+      labelEl.textContent = "In the Queue";
+      sub.innerHTML = `Kits sold out. Get your name on the list to be <b>#${queue + 1}</b> in the Queue.`;
+      btn.textContent = "Join the queue";
+    }
+  }
+
+  async function refresh() {
+    try { render(await rpc("signup_count")); }
+    catch { sub.textContent = "Can't reach the list right now. Retrying…"; }
+  }
+
+  function show(kind, big, text) {
+    result.className = `result show ${kind}`;
+    result.innerHTML = `<div class="big"></div><p></p>`;
+    result.querySelector(".big").textContent = big;
+    result.querySelector("p").textContent = text;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const first = $("first").value.trim(), last = $("last").value.trim();
+    if (!first || !last) return show("error", "Name required", "Enter both your first and last name.");
+
+    btn.disabled = true;
+    try {
+      const rows = await rpc("signup", { p_first: first, p_last: last });
+      const { queue_position: pos, already_listed: already } = rows[0];
+      const pre = already ? "Already on the list. " : "";
+
+      if (pos <= TOTAL_KITS) {
+        show("", `${pre}Kit reserved — #${pos}`,
+          `${first}, your name is on a kit. Be here by 5:00 PM Saturday with $50, or it goes to the next person on the list.`);
+      } else {
+        const q = pos - TOTAL_KITS;
+        show("queue", `${pre}You're #${q} in the Queue`,
+          `${first}, kits are sold out, but if anyone isn't here by 5:00 PM their kit goes to the next person in the queue. Come down and be ready.`);
+      }
+      if (!already) form.reset();
+    } catch (err) {
+      show("error", "Signal lost", "Couldn't save your name. Check your connection and try again.");
+    } finally {
+      btn.disabled = false;
+      refresh();
+    }
+  });
+
+  refresh();
+  setInterval(refresh, REFRESH_SECONDS * 1000);
+</script>
+</body>
+</html>
